@@ -109,7 +109,7 @@ jobs:
           set -euo pipefail
 
           if eksctl get cluster --name "${EKS_CLUSTER_NAME}" --region "${AWS_REGION}" >/dev/null 2>&1; then
-            eksctl update auto-mode-config -f eksctl/cluster.rendered.yaml --approve
+            eksctl update auto-mode-config -f eksctl/cluster.rendered.yaml
           else
             eksctl create cluster -f eksctl/cluster.rendered.yaml
           fi
