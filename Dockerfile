@@ -12,12 +12,12 @@ ENV NODE_ENV=production \
 
 WORKDIR /usr/src/app
 
-RUN addgroup -S pacman && adduser -S pacman -G pacman
+RUN addgroup -S -g 10001 pacman && adduser -S -u 10001 -G pacman pacman
 
 COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 COPY app/ ./
 
-USER pacman
+USER 10001:10001
 
 EXPOSE 8080
 
