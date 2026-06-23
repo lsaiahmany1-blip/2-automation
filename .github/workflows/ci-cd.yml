@@ -133,6 +133,16 @@ jobs:
           sed -i "s|IMAGE_PLACEHOLDER|${{ steps.ecr.outputs.image_uri }}|g" rendered.yaml
           kubectl apply -f rendered.yaml
 
+      - name: Debug Kubernetes resources
+        if: always()
+        shell: bash
+        run: |
+          kubectl get pods -n pacman -o wide
+          kubectl describe pods -n pacman
+          kubectl get events -n pacman --sort-by=.lastTimestamp
+          kubectl logs -n pacman deployment/pacman --all-containers=true --tail=100 || true
+          kubectl logs -n pacman statefulset/mongo --all-containers=true --tail=100 || true
+
       - name: Verify rollout
         shell: bash
         run: |
