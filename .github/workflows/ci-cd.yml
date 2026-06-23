@@ -138,10 +138,10 @@ jobs:
         shell: bash
         run: |
           kubectl get pods -n pacman -o wide
+          kubectl describe deployment pacman -n pacman
           kubectl describe pods -n pacman
-          kubectl get events -n pacman --sort-by=.lastTimestamp
-          kubectl logs -n pacman deployment/pacman --all-containers=true --tail=100 || true
-          kubectl logs -n pacman statefulset/mongo --all-containers=true --tail=100 || true
+          kubectl logs deployment/pacman -n pacman --all-containers=true --tail=200 || true
+          kubectl get events -n pacman --sort-by=.metadata.creationTimestamp
 
       - name: Verify rollout
         shell: bash
