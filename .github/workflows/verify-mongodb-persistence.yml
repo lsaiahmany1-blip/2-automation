@@ -1,0 +1,53 @@
+name: Verify MongoDB Persistence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN || 'arn:aws:iam::123456789012:role/github-actions-eks-deploy' }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME || 'pacman-auto-mode' }}
+
+jobs:
+  verify-mongodb-persistence:
+    name: Verify MongoDB Persistence
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install kubectl
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          KUBECTL_VERSION="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
+          curl -L -o kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+
+          kubectl version --client=true
+
+      - name: Update kubeconfig
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws eks update-kubeconfig \
+            --region "${AWS_REGION}" \
+            --name "${EKS_CLUSTER_NAME}"
+
+      - name: Verify MongoDB Persistence
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          kubectl exec -n pacman mongo-0 -- mongosh pacman --eval 'db.testPersistence.insertOne({project:"pacman", createdAt:new Date()})'
+          kubectl exec -n pacman mongo-0 -- mongosh pacman --eval 'db.testPersistence.find().pretty()'
