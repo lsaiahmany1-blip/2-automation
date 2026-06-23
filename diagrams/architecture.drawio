@@ -1,76 +1,88 @@
 <mxfile host="app.diagrams.net" modified="2026-06-23T00:00:00.000Z" agent="Codex" version="24.7.8">
   <diagram id="pacman-eks-auto-mode" name="Pac-Man EKS Auto Mode Architecture">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="1600" dy="980" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
-        <mxCell id="dev" value="Developer&#xa;git push" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="40" y="120" width="150" height="70" as="geometry"/>
+        <mxCell id="dev" value="Developer&#xa;git push to main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="170" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="gh" value="GitHub Repository&#xa;2-automation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="250" y="120" width="180" height="70" as="geometry"/>
+        <mxCell id="github" value="GitHub Repository&#xa;lsaiahmany1-blip/2-automation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="270" y="110" width="230" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="actions" value="GitHub Actions CI/CD&#xa;OIDC, Docker build, deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="500" y="120" width="220" height="80" as="geometry"/>
+        <mxCell id="actions" value="GitHub Actions&#xa;CI/CD workflow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="560" y="110" width="200" height="70" as="geometry"/>
         </mxCell>
         <mxCell id="aws" value="AWS Account" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="790" y="40" width="520" height="660" as="geometry"/>
+          <mxGeometry x="820" y="40" width="700" height="780" as="geometry"/>
         </mxCell>
-        <mxCell id="iam" value="IAM OIDC Role&#xa;AWS_ROLE_ARN" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="aws">
-          <mxGeometry x="40" y="80" width="180" height="70" as="geometry"/>
+        <mxCell id="oidc" value="AWS OIDC IAM Role&#xa;AssumeRoleWithWebIdentity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="aws">
+          <mxGeometry x="40" y="70" width="220" height="80" as="geometry"/>
         </mxCell>
-        <mxCell id="ecr" value="Amazon ECR&#xa;Pac-Man image" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1" vertex="1" parent="aws">
-          <mxGeometry x="300" y="80" width="180" height="70" as="geometry"/>
+        <mxCell id="ecr" value="Amazon ECR&#xa;Pac-Man Docker image" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1" vertex="1" parent="aws">
+          <mxGeometry x="430" y="70" width="220" height="80" as="geometry"/>
         </mxCell>
-        <mxCell id="eks" value="Amazon EKS Auto Mode&#xa;eksctl managed cluster" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" vertex="1" parent="aws">
-          <mxGeometry x="40" y="210" width="440" height="390" as="geometry"/>
+        <mxCell id="eks" value="Amazon EKS Auto Mode&#xa;Cluster: pacman-auto-mode" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" vertex="1" parent="aws">
+          <mxGeometry x="40" y="210" width="610" height="520" as="geometry"/>
         </mxCell>
-        <mxCell id="nlb" value="Network Load Balancer&#xa;Service type LoadBalancer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="eks">
-          <mxGeometry x="130" y="55" width="190" height="65" as="geometry"/>
+        <mxCell id="lb" value="LoadBalancer Service&#xa;AWS Network Load Balancer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="eks">
+          <mxGeometry x="205" y="55" width="210" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="k8s" value="Kubernetes Namespace: pacman" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontStyle=1" vertex="1" parent="eks">
-          <mxGeometry x="40" y="150" width="360" height="210" as="geometry"/>
+        <mxCell id="namespace" value="Kubernetes Namespace&#xa;pacman" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontStyle=1" vertex="1" parent="eks">
+          <mxGeometry x="40" y="160" width="530" height="320" as="geometry"/>
         </mxCell>
-        <mxCell id="app" value="Pac-Man Deployment&#xa;2 replicas on port 8080" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="k8s">
-          <mxGeometry x="30" y="55" width="150" height="70" as="geometry"/>
+        <mxCell id="deployment" value="Pac-Man Deployment&#xa;2 replicas&#xa;port 8080&#xa;UID/GID 10001" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="namespace">
+          <mxGeometry x="30" y="70" width="170" height="100" as="geometry"/>
         </mxCell>
-        <mxCell id="mongo" value="MongoDB StatefulSet&#xa;Service name: mongo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1" vertex="1" parent="k8s">
-          <mxGeometry x="200" y="55" width="140" height="70" as="geometry"/>
+        <mxCell id="mongoSvc" value="MongoDB Service&#xa;mongo:27017" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1" vertex="1" parent="namespace">
+          <mxGeometry x="235" y="70" width="140" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="pv" value="Persistent Volume&#xa;EBS gp3 PVC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="k8s">
-          <mxGeometry x="200" y="145" width="140" height="50" as="geometry"/>
+        <mxCell id="statefulset" value="MongoDB StatefulSet&#xa;mongo-0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1" vertex="1" parent="namespace">
+          <mxGeometry x="395" y="70" width="120" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="users" value="Users&#xa;Browser access" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="1010" y="760" width="160" height="70" as="geometry"/>
+        <mxCell id="pvc" value="PersistentVolumeClaim&#xa;mongo-data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="namespace">
+          <mxGeometry x="300" y="200" width="160" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="edge1" edge="1" parent="1" source="dev" target="gh" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="ebs" value="EBS Volume&#xa;encrypted gp3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" vertex="1" parent="eks">
+          <mxGeometry x="360" y="420" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="browser" value="User Browser&#xa;Pac-Man game" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1040" y="870" width="180" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge1" edge="1" parent="1" source="dev" target="github" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge2" edge="1" parent="1" source="gh" target="actions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge2" edge="1" parent="1" source="github" target="actions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge3" value="assume role" edge="1" parent="1" source="actions" target="iam" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge3" value="OIDC assume role" edge="1" parent="1" source="actions" target="oidc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge4" value="push image" edge="1" parent="1" source="actions" target="ecr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge4" value="build and push image" edge="1" parent="1" source="actions" target="ecr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge5" value="eksctl + kubectl" edge="1" parent="1" source="actions" target="eks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge5" value="eksctl create/update&#xa;kubectl apply" edge="1" parent="1" source="actions" target="eks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge6" value="pull image" edge="1" parent="aws" source="ecr" target="app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge6" value="pull image" edge="1" parent="aws" source="ecr" target="deployment" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge7" edge="1" parent="eks" source="nlb" target="app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge7" edge="1" parent="eks" source="lb" target="deployment" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge8" value="mongodb://mongo:27017/pacman" edge="1" parent="k8s" source="app" target="mongo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge8" value="mongodb://mongo:27017/pacman" edge="1" parent="namespace" source="deployment" target="mongoSvc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge9" edge="1" parent="k8s" source="mongo" target="pv" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge9" edge="1" parent="namespace" source="mongoSvc" target="statefulset" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="edge10" value="HTTP :80" edge="1" parent="1" source="users" target="nlb" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+        <mxCell id="edge10" edge="1" parent="namespace" source="statefulset" target="pvc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge11" edge="1" parent="eks" source="pvc" target="ebs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge12" value="HTTP" edge="1" parent="1" source="browser" target="lb" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
       </root>
