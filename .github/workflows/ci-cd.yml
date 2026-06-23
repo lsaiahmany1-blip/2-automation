@@ -1,0 +1,143 @@
+name: Build and Deploy Pac-Man to EKS Auto Mode
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN || 'arn:aws:iam::123456789012:role/github-actions-eks-deploy' }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'pacman' }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME || 'pacman-auto-mode' }}
+  K8S_NAMESPACE: pacman
+
+jobs:
+  build-and-deploy:
+    name: Build, Push, and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install kubectl and eksctl
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          KUBECTL_VERSION="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
+          curl -L -o kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+
+          curl --silent --location "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
+          sudo mv /tmp/eksctl /usr/local/bin/eksctl
+
+          kubectl version --client=true
+          eksctl version
+
+      - name: Create or verify ECR repository
+        id: ecr
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+          REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          IMAGE_URI="${REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}"
+
+          if ! aws ecr describe-repositories --repository-names "${ECR_REPOSITORY}" >/dev/null 2>&1; then
+            aws ecr create-repository \
+              --repository-name "${ECR_REPOSITORY}" \
+              --image-scanning-configuration scanOnPush=true \
+              --encryption-configuration encryptionType=AES256
+          fi
+
+          aws ecr put-image-tag-mutability \
+            --repository-name "${ECR_REPOSITORY}" \
+            --image-tag-mutability MUTABLE
+
+          echo "registry=${REGISTRY}" >> "${GITHUB_OUTPUT}"
+          echo "image_uri=${IMAGE_URI}" >> "${GITHUB_OUTPUT}"
+
+      - name: Login to Amazon ECR
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws ecr get-login-password --region "${AWS_REGION}" \
+            | docker login --username AWS --password-stdin "${{ steps.ecr.outputs.registry }}"
+
+      - name: Build Docker image
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build \
+            --tag "${{ steps.ecr.outputs.image_uri }}" \
+            --tag "${{ steps.ecr.outputs.registry }}/${ECR_REPOSITORY}:latest" \
+            .
+
+      - name: Push Docker image to Amazon ECR
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker push "${{ steps.ecr.outputs.image_uri }}"
+          docker push "${{ steps.ecr.outputs.registry }}/${ECR_REPOSITORY}:latest"
+
+      - name: Render eksctl cluster config
+        shell: bash
+        run: |
+          set -euo pipefail
+          perl -pe 's/\$\{EKS_CLUSTER_NAME\}/$ENV{EKS_CLUSTER_NAME}/g; s/\$\{AWS_REGION\}/$ENV{AWS_REGION}/g' \
+            eksctl/cluster.yaml > eksctl/cluster.rendered.yaml
+          cat eksctl/cluster.rendered.yaml
+
+      - name: Create or update EKS Auto Mode cluster
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if eksctl get cluster --name "${EKS_CLUSTER_NAME}" --region "${AWS_REGION}" >/dev/null 2>&1; then
+            eksctl update auto-mode-config -f eksctl/cluster.rendered.yaml --approve
+          else
+            eksctl create cluster -f eksctl/cluster.rendered.yaml
+          fi
+
+      - name: Update kubeconfig
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws eks update-kubeconfig \
+            --region "${AWS_REGION}" \
+            --name "${EKS_CLUSTER_NAME}"
+
+      - name: Deploy Kubernetes manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cp -R kubernetes /tmp/pacman-kubernetes
+          cd /tmp/pacman-kubernetes
+          kubectl kustomize . > rendered.yaml
+          sed -i "s|IMAGE_PLACEHOLDER|${{ steps.ecr.outputs.image_uri }}|g" rendered.yaml
+          kubectl apply -f rendered.yaml
+
+      - name: Verify rollout
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          kubectl rollout status deployment/pacman -n "${K8S_NAMESPACE}" --timeout=300s
+          kubectl rollout status statefulset/mongo -n "${K8S_NAMESPACE}" --timeout=300s
+          kubectl get pods,svc,pvc -n "${K8S_NAMESPACE}" -o wide

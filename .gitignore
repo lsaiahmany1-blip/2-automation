@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+app/node_modules/
+npm-debug.log*
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Build and coverage output
+dist/
+build/
+coverage/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Terraform or local IaC state, if added later
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Temporary workspace files
+work/
+outputs/

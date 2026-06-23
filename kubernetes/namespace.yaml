@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pacman
+  labels:
+    app.kubernetes.io/name: pacman
+    app.kubernetes.io/part-of: pacman-on-eks-auto-mode
