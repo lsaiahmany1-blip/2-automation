@@ -12,7 +12,7 @@ permissions:
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
-  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN || 'arn:aws:iam::123456789012:role/github-actions-eks-deploy' }}
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'pacman' }}
   EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME || 'pacman-auto-mode' }}
   K8S_NAMESPACE: pacman
